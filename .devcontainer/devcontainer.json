@@ -4,7 +4,7 @@
 	"image": "mcr.microsoft.com/devcontainers/python:3.11-bullseye",
 
 	//"postCreateCommand": "pip install --no-cache-dir psycopg2 boto3",
-	"postCreateCommand": "pip install -r requirements.txt",
+	//"postCreateCommand": "pip install -r requirements.txt",
 
 	
 	// Configure tool-specific properties.
