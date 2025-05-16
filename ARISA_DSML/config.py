@@ -28,11 +28,6 @@ FIGURES_DIR = REPORTS_DIR / "figures"
 MODEL_NAME = "wine-quality-bclass"
 
 categorical = [
-    "Pclass",
-    "Sex",
-    "Embarked",
-    "Deck",
-    "Title",
 ]
 
-target = "Survived"
+target = "quality_label"
