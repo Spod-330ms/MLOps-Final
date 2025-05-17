@@ -36,7 +36,7 @@ def run_hyperopt(X_train:pd.DataFrame, y_train:pd.DataFrame, categorical_indices
         def objective(trial:optuna.trial.Trial)->float:
             with mlflow.start_run(nested=True):
                 params = {
-                    "depth": trial.suggest_int("depth", 2, 10),
+                    "depth": trial.suggest_int("depth", 2, 12),
                     "learning_rate": trial.suggest_float("learning_rate", 1e-4, 0.2),
                     "iterations": trial.suggest_int("iterations", 50, 400),
                     "l2_leaf_reg": trial.suggest_float("l2_leaf_reg", 1e-5, 100.0, log=True),
