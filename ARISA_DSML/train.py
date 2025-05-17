@@ -167,7 +167,6 @@ def train(X_train:pd.DataFrame, y_train:pd.DataFrame, categorical_indices:list[i
             title="Cross-Validation (N=5) Mean F1 score with Error Bands",
             xtitle="Training Steps",
             ytitle="Performance Score",
-            #yaxis_range=[0.0, 1.0],
         )
         mlflow.log_figure(fig1, "test-F1-mean_vs_iterations.png")
         logger.info("test-F1-mean vs iterations plot saved")
@@ -193,7 +192,6 @@ def train(X_train:pd.DataFrame, y_train:pd.DataFrame, categorical_indices:list[i
         proba_df = pd.DataFrame(model.predict_proba(X_train), columns=proba_col_names)
         reference_df = pd.concat([reference_df, proba_df], axis=1)
         reference_df[target] = y_train
-        col_names = reference_df.drop(columns=["prediction", target]).columns
         chunk_size = 50
 
         # univariate drift for features
@@ -218,11 +216,9 @@ def train(X_train:pd.DataFrame, y_train:pd.DataFrame, categorical_indices:list[i
         store = nml.io.store.FilesystemStore(root_path=str(MODELS_DIR))
         store.store(udc, filename="udc.pkl")
         store.store(estimator, filename="estimator.pkl")
-        
+
         mlflow.log_artifact(MODELS_DIR / "udc.pkl")
         mlflow.log_artifact(MODELS_DIR / "estimator.pkl")
-        
-
 
     return (model_path, model_params_path)
 
@@ -279,7 +275,7 @@ def plot_error_scatter(  # noqa: PLR0913
             yaxis={"range": yaxis_range},
         )
 
-    #fig.show()
+    # fig.show()
     fig.write_image(FIGURES_DIR / f"{y}_vs_{x}.png")
     return fig
 
@@ -353,4 +349,3 @@ if __name__=="__main__":
     model_path, model_params_path = train(X_train, y_train, categorical_indices, params, cv_results=cv_results)
 
     cv_results = pd.read_csv(cv_output_path)
-    
