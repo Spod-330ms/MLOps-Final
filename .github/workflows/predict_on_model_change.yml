@@ -22,14 +22,14 @@ jobs:
           python-version: "3.11"
       - name: Install dependencies
         run: make requirements
-      - name: Create kaggle directory
-        env: 
-          KAGGLE_KEY: ${{ secrets.KAGGLE_KEY }}
-        run: |
-          mkdir -p $HOME/.config
-          mkdir -p $HOME/.config/kaggle
-          echo "$KAGGLE_KEY" > $HOME/.config/kaggle/kaggle.json
-          chmod 600 $HOME/.config/kaggle/kaggle.json
+      #- name: Create kaggle directory
+      #  env: 
+      #    KAGGLE_KEY: ${{ secrets.KAGGLE_KEY }}
+      #  run: |
+      #    mkdir -p $HOME/.config
+      #    mkdir -p $HOME/.config/kaggle
+      #    echo "$KAGGLE_KEY" > $HOME/.config/kaggle/kaggle.json
+      #    chmod 600 $HOME/.config/kaggle/kaggle.json
       - name: Run preprocessing
         run: make preprocess
 
