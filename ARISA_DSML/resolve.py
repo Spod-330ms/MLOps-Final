@@ -12,8 +12,9 @@ def get_model_by_alias(client, model_name:str=MODEL_NAME, alias:str="champion"):
     except Exception as e:
         if f"alias {alias} not found" in str(e):
             return None
-        raise(e)
+        raise (e)
     return alias_mv
+
 
 if __name__=="__main__":
     client = MlflowClient(mlflow.get_tracking_uri())
@@ -45,6 +46,6 @@ if __name__=="__main__":
         else:
             challenge_failed_exc = "Challenger model does not surpass metric of current champion, ending predict workflow."
             logger.error(challenge_failed_exc)
-            raise(Exception(challenge_failed_exc))
+            raise (Exception(challenge_failed_exc))
     elif champ_mv and chall_mv is None:
         logger.info("No challenger to champion, continuing with prediction.")

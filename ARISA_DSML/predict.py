@@ -5,9 +5,8 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from loguru import logger
 import shap
-import joblib
 import os
-from ARISA_DSML.config import FIGURES_DIR, MODELS_DIR, target, PROCESSED_DATA_DIR, categorical, MODEL_NAME
+from ARISA_DSML.config import FIGURES_DIR, MODELS_DIR, target, PROCESSED_DATA_DIR, MODEL_NAME
 from ARISA_DSML.resolve import get_model_by_alias
 import mlflow
 from mlflow.client import MlflowClient
@@ -26,9 +25,9 @@ def plot_shap(model:CatBoostClassifier, df_plot:pd.DataFrame)->None:
 
 def predict(model:CatBoostClassifier, df_pred:pd.DataFrame, params:dict, probs=False)->str|Path:
     """Do predictions on test data."""
-    
+
     feature_columns = params.pop("feature_columns")
-    
+
     preds = model.predict(df_pred[feature_columns])
     proba_cols = [f"proba_{cls}" for cls in model.classes_]
 
@@ -62,7 +61,6 @@ if __name__=="__main__":
     log_model_meta = json.loads(run.data.tags['mlflow.log-model.history'])
     log_model_meta[0]['signature']
 
-
     _, artifact_folder = os.path.split(model_info.source)
     logger.info(artifact_folder)
     model_uri = "runs:/{}/{}".format(model_info.run_id, artifact_folder)
@@ -75,13 +73,13 @@ if __name__=="__main__":
     store = nml.io.store.FilesystemStore(root_path=str(MODELS_DIR))
     udc = store.load(filename="udc.pkl", as_type=nml.UnivariateDriftCalculator)
     estimator = store.load(filename="estimator.pkl", as_type=nml.CBPE)
-    
+
     logger.info(f"Loaded UDC chunk_size: {udc.chunker.chunk_size}")
 
     params = run_data_dict["params"]
     params["feature_columns"] = [inp["name"] for inp in json.loads(log_model_meta[0]['signature']['inputs'])]
     preds_path = predict(loaded_model, df_test, params, probs=True)
-    
+
     df_preds = pd.read_csv(preds_path)
 
     analysis_df = df_test.copy()
@@ -91,16 +89,15 @@ if __name__=="__main__":
         analysis_df[col] = df_preds[col]
 
     logger.info(f"Analysis value counts: {analysis_df['quality_label'].value_counts(dropna=False)}")
-    #n_chunks = int(np.ceil(len(analysis_df) / udc.chunker.chunk_size))
+    # n_chunks = int(np.ceil(len(analysis_df) / udc.chunker.chunk_size))
     logger.info(f"quality_label dtype in analysis: {analysis_df['quality_label'].dtype}")
     n_chunks = int(len(analysis_df) / udc.chunker.chunk_size)
 
     for i in range(n_chunks):
-        chunk = analysis_df.iloc[i*udc.chunker.chunk_size : (i+1)*udc.chunker.chunk_size]
+        chunk = analysis_df.iloc[i*udc.chunker.chunk_size: (i+1)*udc.chunker.chunk_size]
         value_counts = chunk["quality_label"].value_counts(dropna=False)
         logger.info(f"Chunk {i+1}/{n_chunks} value counts:\n{value_counts}")
 
-    from ARISA_DSML.train import get_or_create_experiment
     from ARISA_DSML.helpers import get_git_commit_hash
 
     git_hash = get_git_commit_hash()
@@ -119,7 +116,7 @@ if __name__=="__main__":
         drop_cols = ["prediction"] + proba_cols + [target]
         univariate_drift = udc.calculate(analysis_df.drop(columns=drop_cols, axis=1))
         plot_col_names = analysis_df.drop(columns=drop_cols, axis=1).columns
-        
+
         logger.info(f"Univariate drift columns: {plot_col_names}")
 
         for p in plot_col_names:

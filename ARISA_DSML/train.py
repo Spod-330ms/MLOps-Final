@@ -219,14 +219,14 @@ def train(X_train:pd.DataFrame, y_train:pd.DataFrame, categorical_indices:list[i
 
         mlflow.log_artifact(MODELS_DIR / "udc.pkl")
         mlflow.log_artifact(MODELS_DIR / "estimator.pkl")
-        
+
         logger.info(f"quality_label dtype in reference: {reference_df['quality_label'].dtype}")
         logger.info(f"Reference value counts: {reference_df['quality_label'].value_counts(dropna=False)}")
 
         n_chunks = int(len(reference_df) / chunk_size)
 
         for i in range(n_chunks):
-            chunk = reference_df.iloc[i*chunk_size : (i+1)*chunk_size]
+            chunk = reference_df.iloc[i*chunk_size: (i+1)*chunk_size]
             value_counts = chunk["quality_label"].value_counts(dropna=False)
             logger.info(f"Chunk {i+1}/{n_chunks} value counts:\n{value_counts}")
 
