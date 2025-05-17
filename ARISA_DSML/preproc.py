@@ -7,7 +7,7 @@ from kaggle.api.kaggle_api_extended import KaggleApi
 from loguru import logger
 import pandas as pd
 
-from ARISA_DSML.config import DATASET, DATASET_TEST, PROCESSED_DATA_DIR, RAW_DATA_DIR, INPUT_FILE_NAME
+from ARISA_DSML.config import DATASET, DATASET_TEST, PROCESSED_DATA_DIR, RAW_DATA_DIR, INPUT_FILE_NAME, quality_mapping
 
 
 def get_raw_data(dataset:str=DATASET, dataset_test:str=DATASET_TEST)->None:
@@ -33,6 +33,8 @@ def preprocess_df(file:str|Path)->str|Path:
     """Preprocess datasets."""
     _, file_name = os.path.split(file)
     df_data = pd.read_csv(file)
+
+    df_data["quality_label"] = df_data["quality_label"].map(quality_mapping)
 
     PROCESSED_DATA_DIR.mkdir(parents=True, exist_ok=True)
     outfile_path = PROCESSED_DATA_DIR / file_name

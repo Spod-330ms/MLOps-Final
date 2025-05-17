@@ -33,3 +33,17 @@ categorical = [
 ]
 
 target = "quality_label"
+
+quality_mapping = {
+    "low": 0,
+    "medium": 1,
+    "high": 2
+}
+
+quality_mapping_inverted = {
+    0: "low",
+    1: "medium",
+    2: "high"
+}
+
+
