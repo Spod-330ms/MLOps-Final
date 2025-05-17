@@ -2,8 +2,6 @@
 
 import os
 from pathlib import Path
-import re
-import zipfile
 
 from kaggle.api.kaggle_api_extended import KaggleApi
 from loguru import logger
@@ -42,6 +40,7 @@ def preprocess_df(file:str|Path)->str|Path:
 
     return outfile_path
 
+
 def split_data(file:str|Path, test_size:float=0.2)->None:
     """Split the data into train and test sets."""
     df_data = pd.read_csv(file)
@@ -54,6 +53,7 @@ def split_data(file:str|Path, test_size:float=0.2)->None:
     df_train.to_csv(train_file, index=False)
     df_test.to_csv(test_file, index=False)
 
+
 if __name__=="__main__":
     # get the train and test sets from default location
     logger.info("getting datasets")
@@ -62,7 +62,7 @@ if __name__=="__main__":
     # split the data into train and test sets
     logger.info("splitting data into train and test sets")
     split_data(RAW_DATA_DIR / INPUT_FILE_NAME)
-    
+
     # preprocess both sets
     logger.info("preprocessing train.csv")
     preprocess_df(RAW_DATA_DIR / "train.csv")
