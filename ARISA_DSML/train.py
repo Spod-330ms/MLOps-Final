@@ -38,7 +38,7 @@ def run_hyperopt(X_train:pd.DataFrame, y_train:pd.DataFrame, categorical_indices
                 params = {
                     "depth": trial.suggest_int("depth", 2, 10),
                     "learning_rate": trial.suggest_float("learning_rate", 1e-4, 0.2),
-                    "iterations": trial.suggest_int("iterations", 50, 350),
+                    "iterations": trial.suggest_int("iterations", 50, 400),
                     "l2_leaf_reg": trial.suggest_float("l2_leaf_reg", 1e-5, 100.0, log=True),
                     "bagging_temperature": trial.suggest_float("bagging_temperature", 0.01, 1),
                     "random_strength": trial.suggest_float("random_strength", 1e-5, 100.0, log=True),
