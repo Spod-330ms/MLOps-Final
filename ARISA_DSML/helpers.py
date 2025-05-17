@@ -23,4 +23,4 @@ def get_git_commit_hash():
         ).decode("utf-8").strip()
         return commit_hash
     except subprocess.CalledProcessError:
-        return None  # Not a git repository or error occurred
+        return "unknown"  # Not a git repository or error occurred - return a default value

@@ -76,6 +76,8 @@ if __name__=="__main__":
     udc = store.load(filename="udc.pkl", as_type=nml.UnivariateDriftCalculator)
     estimator = store.load(filename="estimator.pkl", as_type=nml.CBPE)
     
+    logger.info(f"Loaded UDC chunk_size: {udc.chunker.chunk_size}")
+
     params = run_data_dict["params"]
     params["feature_columns"] = [inp["name"] for inp in json.loads(log_model_meta[0]['signature']['inputs'])]
     preds_path = predict(loaded_model, df_test, params, probs=True)
@@ -88,6 +90,16 @@ if __name__=="__main__":
     for col in proba_cols:
         analysis_df[col] = df_preds[col]
 
+    logger.info(f"Analysis value counts: {analysis_df['quality_label'].value_counts(dropna=False)}")
+    #n_chunks = int(np.ceil(len(analysis_df) / udc.chunker.chunk_size))
+    logger.info(f"quality_label dtype in analysis: {analysis_df['quality_label'].dtype}")
+    n_chunks = int(len(analysis_df) / udc.chunker.chunk_size)
+
+    for i in range(n_chunks):
+        chunk = analysis_df.iloc[i*udc.chunker.chunk_size : (i+1)*udc.chunker.chunk_size]
+        value_counts = chunk["quality_label"].value_counts(dropna=False)
+        logger.info(f"Chunk {i+1}/{n_chunks} value counts:\n{value_counts}")
+
     from ARISA_DSML.train import get_or_create_experiment
     from ARISA_DSML.helpers import get_git_commit_hash
 
@@ -99,16 +111,23 @@ if __name__=="__main__":
         estimated_performance = estimator.estimate(analysis_df)
         fig1 = estimated_performance.plot()
         mlflow.log_figure(fig1, "estimated_performance.png")
-        drop_cols = ["prediction"] + proba_cols
+
+        for col in analysis_df.drop(columns=["prediction"] + proba_cols):
+            unique_vals = analysis_df[col].nunique(dropna=True)
+            logger.info(f"Column {col} unique values: {unique_vals}")
+
+        drop_cols = ["prediction"] + proba_cols + [target]
         univariate_drift = udc.calculate(analysis_df.drop(columns=drop_cols, axis=1))
         plot_col_names = analysis_df.drop(columns=drop_cols, axis=1).columns
         
+        logger.info(f"Univariate drift columns: {plot_col_names}")
+
         for p in plot_col_names:
             try:
                 fig2 = univariate_drift.filter(column_names=[p]).plot()
                 mlflow.log_figure(fig2, f"univariate_drift_{p}.png")
                 fig3 = univariate_drift.filter(period="analysis", column_names=[p]).plot(kind='distribution')
                 mlflow.log_figure(fig3, f"univariate_drift_dist_{p}.png")
-            except:
-                logger.info("failed to plot some univariate drift analyses!")
+            except Exception as e:
+                logger.exception(f"Failed to plot univariate drift for column {p}: {e}")
         mlflow.log_params({"git_hash": git_hash})
