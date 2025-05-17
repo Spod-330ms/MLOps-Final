@@ -35,7 +35,7 @@ Trying to predict quality of wine
 │   └── figures        <- Generated graphics and figures to be used in reporting
 │
 ├── requirements.txt   <- The requirements file for reproducing the analysis environment, e.g.
-│                         generated with `pip freeze > requirements.txt`
+│                         generated with `pip freeze > requirements.txt`. Run `pip install -r requirements.txt` to install
 │
 ├── setup.cfg          <- Configuration file for flake8
 │
